@@ -18,15 +18,24 @@
         document.getElementsByTagName("html")[0].style.fontSize = document.documentElement.clientWidth/20 + 'px';
     </script>
 </head>
-<body>
 	<header class="head">
         <div class="head_logo_div">
             <img class="logo_img" src="images/upload/head.jpg"></a>
         </div>
+        <style>
+    /* 将样式直接应用于元素以设置字体大小、颜色和位置 */
+        #returnHome {
+        font-size: 20px; /* 设置字体大小 */
+        color: red; /* 设置字体颜色为红色 */
+        position: absolute; /* 绝对定位 */
+        top: 20px; /* 距离顶部的位置 */
+        left: 20px; /* 距离左侧的位置 */
+        }
+        </style>
+        <a href="https://zgsrbht.github.io/skk-0716-13/index.html"><div id="returnHome">返回主页</div></a>
         <div class="head_nav_div">
              <nav class="head_nav">
                 <ul id="nav_ul">
-                    <a href="https://zgsrbht.github.io/skk-0716-13/index.html"><li class="nav_ul_li">返回主页</li></a>
                     <li class="nav_li_on nav_ul_li">Home</li>
                     <li class="nav_ul_li">个人体验</li>
                     <li class="nav_ul_li">KEY式浪漫</li>
