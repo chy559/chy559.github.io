@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>chy559 | Personal Blog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <header class="site-shell">
+      <nav class="topbar" aria-label="主导航">
+        <a class="brand" href="#home" data-route="home" aria-label="返回个人主页">
+          <span class="brand-mark">559</span>
+          <span>chy559</span>
+        </a>
+        <div class="nav-links">
+          <a href="#home" data-route="home">主页</a>
+          <a href="#tech" data-route="tech">技术</a>
+          <a href="#game" data-route="game">游戏</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="site-shell">
+      <section id="view-home" class="view view-active">
+        <div class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">personal notebook / code / games</p>
+            <h1>chy559 的个人博客</h1>
+            <p class="intro">
+              这里会收纳技术笔记、项目复盘、galgame 感想，以及那些不太好归类但值得留下的游戏片段。
+            </p>
+            <div class="hero-actions" aria-label="快速入口">
+              <a class="primary-action" href="#tech" data-route="tech">进入技术分区</a>
+              <a class="secondary-action" href="#game" data-route="game">进入游戏分区</a>
+            </div>
+          </div>
+
+          <aside class="profile-card" aria-label="个人信息">
+            <div class="avatar-frame">
+              <img src="./assets/avatar.png" alt="chy559 的头像" />
+            </div>
+            <div>
+              <p class="profile-label">nickname</p>
+              <h2>chy559</h2>
+              <p class="profile-note">代码、故事、游戏记录。慢慢写，认真整理。</p>
+            </div>
+          </aside>
+        </div>
+
+        <div class="section-grid">
+          <article class="portal-card tech-card" tabindex="0" data-route="tech">
+            <span class="portal-number">01</span>
+            <h2>技术分区</h2>
+            <p>组件设计、项目记录、学习笔记。</p>
+          </article>
+          <article class="portal-card game-card" tabindex="0" data-route="game">
+            <span class="portal-number">02</span>
+            <h2>游戏分区</h2>
+            <p>游戏的游玩记录、杂谈和推荐清单。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="view-tech" class="view" aria-labelledby="tech-title">
+        <div class="page-head">
+          <p class="eyebrow">section 01</p>
+          <h1 id="tech-title">技术分区</h1>
+          <p>把踩过的坑、学到的东西和未来想做的工程实验，都安静地放在这里。</p>
+        </div>
+        <div class="article-list" data-category="tech"></div>
+      </section>
+
+      <section id="view-game" class="view" aria-labelledby="game-title">
+        <div class="page-head game-head">
+          <p class="eyebrow">section 02</p>
+          <h1 id="game-title">游戏分区</h1>
+          <p>一半是视觉小说的余韵，一半是各种玩法的记忆切片。</p>
+        </div>
+        <div class="subnav" aria-label="游戏子分区">
+          <button type="button" class="subnav-active" data-game-tab="galgame">Galgame</button>
+          <button type="button" data-game-tab="nongalgame">非 Galgame</button>
+        </div>
+        <div class="article-list" data-category="galgame"></div>
+        <div class="article-list hidden" data-category="nongalgame"></div>
+      </section>
+
+      <section id="view-article" class="view article-detail" aria-live="polite">
+        <button class="back-button" type="button">返回</button>
+        <article class="detail-panel">
+          <p class="eyebrow" id="detail-category">article</p>
+          <h1 id="detail-title">文章标题</h1>
+          <p id="detail-summary"></p>
+          <div class="empty-detail">
+            <span>COMING SOON</span>
+            <p>这篇文章还没有正文。等内容写好后，这里会变成完整的阅读页。</p>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-shell footer">
+      <span>© 2026 chy559</span>
+      <span>built as a quiet archive for code and games</span>
+    </footer>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
