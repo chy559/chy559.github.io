@@ -1,0 +1,44 @@
+{
+  "posts": [
+    {
+      "title": "先把博客做成可持续扩写的样子",
+      "slug": "welcome-tech-archive",
+      "category": "tech",
+      "date": "2026-05-18",
+      "summary": "这篇文章用来说明这个博客为什么先从结构开始整理，以及以后会往哪里扩展。",
+      "path": "./content/posts/welcome-tech-archive.md",
+      "excerpt": "先把博客做成可持续扩写的样子 这次没有先急着堆内容，而是先把内容结构理顺。原因很简单：如果文章系统本身不顺手，那么每次写新东西都会变成一次额外的工程活。 现在这版的目标 首页先承担归档入口，而不是信息流 文章列表只展示必要摘要，减少视觉噪音 正文页优先保证可读性，而不是花哨效果 内容来源统一为 markdown，后续扩写更轻 以后会继续补的东西 后面技术分区...",
+      "wordCount": 206
+    },
+    {
+      "title": "一篇 Galgame 记录应该保留什么",
+      "slug": "first-galgame-note",
+      "category": "galgame",
+      "date": "2026-05-17",
+      "summary": "不是只写一句好玩或不好玩，而是尽量留下角色、路线和当时读完后的情绪结构。",
+      "path": "./content/posts/first-galgame-note.md",
+      "excerpt": "一篇 Galgame 记录应该保留什么 视觉小说的感想如果只剩一句“很感动”或者“剧情不错”，其实很快就会失真。真正值得留下的，往往是更细一点的东西。 我更想留下的部分 哪条路线真正改变了我对作品的理解 哪个角色的弧线最完整 某个结尾为什么在当下特别有效 作品的节奏问题究竟出在哪里 为什么单独做这个分区 因为这类记录更像阅读痕迹，不太像传统游戏评测。单独分开...",
+      "wordCount": 179
+    },
+    {
+      "title": "给非 Galgame 区留一个起点",
+      "slug": "non-galgame-checkpoint",
+      "category": "nongalgame",
+      "date": "2026-05-16",
+      "summary": "这里以后会放动作、RPG、独立游戏和一些阶段性的游玩记录，先留一个开头。",
+      "path": "./content/posts/non-galgame-checkpoint.md",
+      "excerpt": "给非 Galgame 区留一个起点 这个分区更像杂记，但不是随手流水账。我还是想尽量保留每款游戏里真正值得回看的部分。 可能会记录的角度 某个系统设计为什么顺手 某段流程为什么拖沓 通关后回看，哪些瞬间最能代表这款游戏 它在同类作品里到底特别在哪里 后面内容会慢慢补进来，先让这个区从空白状态里出来。",
+      "wordCount": 129
+    },
+    {
+      "title": "anemoi完结，我的五一也结束了。一个普通键子的一点感想",
+      "slug": "anemoi-finished-may-day",
+      "category": "galgame",
+      "date": "2026-05-06",
+      "summary": "赶在五一尾声推完《anemoi》之后，一个喜欢 Key 很久的玩家写下的一点失落、眷恋和没法轻易释怀的感想。",
+      "path": "./content/posts/anemoi-finished-may-day.md",
+      "excerpt": "anemoi 赶在五一的尾巴推完了 anemoi，作为 Key 的长篇，从 23 年初次看到 PV 就一直在期待着的作品，说实话我是有点失望的...... 从初中初次接触 Angel Beats!、CLANNAD 的动漫，我便爱上了这个以写感人催泪故事见长的 gal 社。可以说，Key 社是我入坑动漫和 gal 的原因和契机，所以 Key 社对我到底意味着什...",
+      "wordCount": 470
+    }
+  ]
+}
