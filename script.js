@@ -317,10 +317,16 @@ async function openArticleBySlug(slug) {
     const markdown = article.content || stripFrontmatter(await fetchText(article.path));
     contentNode.innerHTML = renderMarkdown(markdown);
   } catch (error) {
+    console.error("Article render failed", {
+      slug,
+      path: article.path,
+      hasEmbeddedContent: Boolean(article.content),
+      error
+    });
     contentNode.innerHTML = `
       <div class="empty-state">
         <h2>正文加载失败</h2>
-        <p>这篇文章的 markdown 文件暂时没能读取成功。</p>
+        <p>这篇文章的正文没有从内容索引中读到，单篇 markdown 备用加载也失败了。请确认 GitHub Pages 已部署最新的 posts-manifest.json 和 script.js。</p>
       </div>
     `;
   } finally {
