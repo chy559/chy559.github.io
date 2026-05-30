@@ -104,7 +104,8 @@ img {
 .back-button:focus-visible,
 .category-tile:focus-visible,
 .article-card:focus-visible,
-.featured-card:focus-visible {
+.featured-card:focus-visible,
+.collection-card:focus-visible {
   outline: 3px solid rgba(36, 87, 214, 0.28);
   outline-offset: 3px;
 }
@@ -509,6 +510,89 @@ img {
 
 .category-tile h3 {
   font-size: 2rem;
+}
+
+.collection-grid {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0 26px;
+}
+
+.collection-grid:empty {
+  display: none;
+}
+
+.collection-grid-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.collection-grid-head .eyebrow {
+  margin: 0;
+}
+
+.collection-grid-head h2 {
+  margin: 0;
+  font-family: "Noto Serif SC", serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 900;
+}
+
+.collection-card {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  min-height: 190px;
+  padding: 26px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(90deg, rgba(36, 87, 214, 0.08) 0 4px, transparent 4px),
+    rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.collection-card:hover,
+.collection-card:focus-visible {
+  border-color: var(--line-strong);
+  background-color: var(--paper);
+  box-shadow: var(--shadow-strong);
+}
+
+.collection-count {
+  width: fit-content;
+  min-height: 30px;
+  padding: 6px 10px;
+  color: var(--red);
+  border: 1px solid rgba(194, 65, 58, 0.18);
+  background: var(--red-soft);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.collection-card h3 {
+  margin: 0;
+  font-family: "Noto Serif SC", serif;
+  font-size: clamp(2.1rem, 5vw, 3.6rem);
+  font-weight: 900;
+  line-height: 0.98;
+}
+
+.collection-card p {
+  max-width: 68ch;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
 }
 
 .section-view {

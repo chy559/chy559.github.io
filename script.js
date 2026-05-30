@@ -5,9 +5,11 @@ const state = {
     nongalgame: []
   },
   articlesBySlug: new Map(),
+  collections: new Map(),
   featured: null,
   previousRoute: "home",
-  currentGameTab: "galgame"
+  currentGameTab: "galgame",
+  currentCollection: null
 };
 
 const placeholders = {
@@ -74,6 +76,7 @@ function stripFrontmatter(rawMarkdown) {
 
 function inlineMarkdown(text) {
   return escapeHtml(text)
+    .replace(/!\[([^\]]*)\]\((file:\/\/\/|[A-Za-z]:\\)[^)]+\)/g, "")
     .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" loading="lazy" />')
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
@@ -154,6 +157,17 @@ function renderMarkdown(markdown) {
       flushList();
       flushQuote();
       blocks.push(`<figure class="article-media">${inlineMarkdown(line.trim())}</figure>`);
+      continue;
+    }
+
+    if (/^<img\s/i.test(line.trim())) {
+      if (/src=["'](?:file:\/\/\/|[A-Za-z]:\\)/i.test(line.trim())) {
+        continue;
+      }
+      flushParagraph();
+      flushList();
+      flushQuote();
+      blocks.push(`<figure class="article-media">${line.trim()}</figure>`);
       continue;
     }
 
@@ -239,6 +253,7 @@ function renderFeatured() {
 function renderLists() {
   document.querySelectorAll(".article-list").forEach((list) => {
     const category = list.dataset.category;
+    if (!category) return;
     const items = state.articlesByCategory[category] || [];
 
     if (!items.length) {
@@ -276,6 +291,59 @@ function renderLists() {
   });
 }
 
+function renderArticleCards(target, items) {
+  target.innerHTML = items
+    .map(
+      (article) => `
+        <article class="article-card" tabindex="0" data-article-slug="${article.slug}">
+          <div class="article-card-main">
+            <div class="article-card-meta">
+              <span class="article-tag">${article.collectionTitle || slugToCategoryLabel(article.category)}</span>
+              <span>${formatDate(article.date)}</span>
+            </div>
+            <h2>${escapeHtml(article.title)}</h2>
+            <p>${escapeHtml(article.summary)}</p>
+          </div>
+          <span class="article-card-tail">
+            <span>${escapeHtml(article.readingTime)}</span>
+            <span class="tail-arrow" aria-hidden="true">→</span>
+          </span>
+        </article>
+      `
+    )
+    .join("");
+}
+
+function renderCollections() {
+  const target = document.querySelector("#tech-collections");
+  if (!target) return;
+
+  const collections = [...state.collections.values()].filter((collection) => collection.category === "tech");
+  if (!collections.length) {
+    target.innerHTML = "";
+    return;
+  }
+
+  target.innerHTML = `
+    <div class="collection-grid-head">
+      <p class="eyebrow">Tech collections</p>
+      <h2>专题集合</h2>
+    </div>
+    ${collections
+      .map(
+        (collection) => `
+          <article class="collection-card" tabindex="0" data-collection-id="${collection.id}">
+            <span class="collection-count">${collection.posts.length} posts</span>
+            <h3>${escapeHtml(collection.title)}</h3>
+            <p>${escapeHtml(collection.summary)}</p>
+            <span class="featured-link">查看集合</span>
+          </article>
+        `
+      )
+      .join("")}
+  `;
+}
+
 function setRoute(route, options = {}) {
   const normalized = route || "home";
   const target = document.querySelector(`#view-${normalized}`);
@@ -289,19 +357,33 @@ function setRoute(route, options = {}) {
     link.classList.toggle("nav-active", link.dataset.route === normalized);
   });
 
-  if (normalized !== "article") {
+  if (normalized !== "article" && normalized !== "collection") {
     state.previousRoute = normalized;
   }
 
   if (!options.skipHistory) {
     if (normalized === "article" && options.slug) {
       window.history.replaceState(null, "", `#article/${options.slug}`);
+    } else if (normalized === "collection" && options.collectionId) {
+      window.history.replaceState(null, "", `#collection/${options.collectionId}`);
     } else {
       window.history.replaceState(null, "", `#${normalized}`);
     }
   }
 
   window.scrollTo({ top: 0, behavior: options.instant ? "auto" : "smooth" });
+}
+
+function openCollection(collectionId) {
+  const collection = state.collections.get(collectionId);
+  if (!collection) return;
+
+  state.currentCollection = collectionId;
+  document.querySelector("#collection-eyebrow").textContent = "Tech collection";
+  document.querySelector("#collection-title").textContent = collection.title;
+  document.querySelector("#collection-summary").textContent = collection.summary;
+  renderArticleCards(document.querySelector("#collection-list"), collection.posts);
+  setRoute("collection", { collectionId });
 }
 
 async function openArticleBySlug(slug) {
@@ -346,18 +428,54 @@ function parseHash() {
   if (hash.startsWith("article/")) {
     return { route: "article", slug: hash.slice("article/".length) };
   }
+  if (hash.startsWith("collection/")) {
+    return { route: "collection", collectionId: hash.slice("collection/".length) };
+  }
   return { route: hash };
 }
 
 function setupData(posts) {
   const sorted = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const collections = new Map();
+
+  sorted.forEach((post) => {
+    if (!post.collection) return;
+
+    const existing = collections.get(post.collection) || {
+      id: post.collection,
+      title: post.collectionTitle || post.collection,
+      category: post.category,
+      summary:
+        post.collection === "paiflow"
+          ? "围绕 PaiFlow AI 工作流编排平台整理的部署、DSL、引擎、SSE、LLM 执行器、插件节点和面试问答。"
+          : post.collection === "paismart"
+            ? "围绕 PaiSmart 知识库与考辅智聊项目整理的 RAG、文件上传、混合检索、聊天助手和部署笔记。"
+            : post.collection === "paicli"
+              ? "围绕 PaiCli / MINI-CLI 本地 Agent CLI 整理的 ReAct、Plan、Multi-Agent、Memory、RAG、HITL 和面试问答。"
+              : post.collection === "baguwen"
+                ? "后端面试复习集合，收纳 Java、JUC、JVM、Spring、数据库、消息队列、计网、OS 和 Agent 八股笔记。"
+          : "",
+      posts: []
+    };
+
+    existing.posts.push(post);
+    existing.summary =
+      existing.summary ||
+      `收纳 ${existing.title} 相关的学习笔记、项目拆解和面试复盘。`;
+    collections.set(post.collection, existing);
+  });
+
+  collections.forEach((collection) => {
+    collection.posts.sort((a, b) => (a.seriesOrder || 0) - (b.seriesOrder || 0));
+  });
 
   state.articlesByCategory = {
-    tech: sorted.filter((post) => post.category === "tech"),
+    tech: sorted.filter((post) => post.category === "tech" && !post.collection),
     galgame: sorted.filter((post) => post.category === "galgame"),
     nongalgame: sorted.filter((post) => post.category === "nongalgame")
   };
   state.articlesBySlug = new Map(sorted.map((post) => [post.slug, post]));
+  state.collections = collections;
   state.featured = sorted[0] || null;
 }
 
@@ -387,11 +505,17 @@ function bindEvents() {
       openArticleBySlug(articleTarget.dataset.articleSlug);
       return;
     }
+
+    const collectionTarget = event.target.closest("[data-collection-id]");
+    if (collectionTarget) {
+      openCollection(collectionTarget.dataset.collectionId);
+      return;
+    }
   });
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" && event.key !== " ") return;
-    const interactiveCard = event.target.closest(".category-tile, .article-card, .featured-card");
+    const interactiveCard = event.target.closest(".category-tile, .article-card, .featured-card, .collection-card");
     if (!interactiveCard) return;
     event.preventDefault();
     interactiveCard.click();
@@ -412,14 +536,22 @@ function bindEvents() {
     });
   });
 
-  document.querySelector(".back-button").addEventListener("click", () => {
+  document.querySelector(".article-view .back-button").addEventListener("click", () => {
     setRoute(state.previousRoute);
+  });
+
+  document.querySelector(".collection-back-button").addEventListener("click", () => {
+    setRoute("tech");
   });
 
   window.addEventListener("hashchange", () => {
     const parsed = parseHash();
     if (parsed.route === "article" && parsed.slug) {
       openArticleBySlug(parsed.slug);
+      return;
+    }
+    if (parsed.route === "collection" && parsed.collectionId) {
+      openCollection(parsed.collectionId);
       return;
     }
     setRoute(parsed.route, { skipHistory: true, instant: true });
@@ -432,6 +564,7 @@ async function init() {
   try {
     await loadPosts();
     renderFeatured();
+    renderCollections();
     renderLists();
   } catch (error) {
     document.querySelectorAll(".article-list").forEach((list) => {
@@ -448,6 +581,11 @@ async function init() {
   const parsed = parseHash();
   if (parsed.route === "article" && parsed.slug) {
     await openArticleBySlug(parsed.slug);
+    return;
+  }
+
+  if (parsed.route === "collection" && parsed.collectionId) {
+    openCollection(parsed.collectionId);
     return;
   }
 

@@ -18,6 +18,16 @@ summary: 用一句简短的话概括这篇文章会写什么。
 ---
 ```
 
+如果文章属于某个专题集合，可以额外加：
+
+```md
+collection: paiflow
+collectionTitle: Paiflow
+seriesOrder: 1
+```
+
+同一个 `collection` 会在技术区汇总成一个集合入口，`seriesOrder` 决定集合内排序。
+
 ## category 可选值
 
 - `tech`

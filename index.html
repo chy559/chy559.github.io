@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;600;700;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260530b" />
+    <link rel="stylesheet" href="./styles.css?v=20260530f" />
   </head>
   <body>
     <div class="page-noise" aria-hidden="true"></div>
@@ -99,7 +99,23 @@
             <h1 id="tech-title">技术分区</h1>
             <p>记录能复用的经验、值得保留的实现细节，以及以后回头看仍然有价值的工程思路。</p>
           </div>
+          <div id="tech-collections" class="collection-grid" aria-live="polite"></div>
           <div class="article-list" data-category="tech" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section id="view-collection" class="view section-view" aria-live="polite">
+        <div class="shell">
+          <button class="back-button collection-back-button" type="button">
+            <span aria-hidden="true">←</span>
+            <span>返回技术分区</span>
+          </button>
+          <div class="page-head collection-page-head">
+            <p class="eyebrow" id="collection-eyebrow">Collection</p>
+            <h1 id="collection-title">集合</h1>
+            <p id="collection-summary"></p>
+          </div>
+          <div id="collection-list" class="article-list collection-list"></div>
         </div>
       </section>
 
@@ -152,6 +168,6 @@
       </div>
     </footer>
 
-    <script src="./script.js?v=20260530b"></script>
+    <script src="./script.js?v=20260530f"></script>
   </body>
 </html>
