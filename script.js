@@ -216,9 +216,15 @@ function renderFeatured() {
     return;
   }
 
+  const imageMatch = featured.content?.match(/!\[([^\]]*)\]\(([^)]+)\)/);
+  const imageHtml = imageMatch
+    ? `<img class="featured-image" src="${escapeHtml(imageMatch[2])}" alt="${escapeHtml(imageMatch[1] || featured.title)}" loading="lazy" />`
+    : "";
+
   slot.classList.remove("skeleton-block");
   slot.innerHTML = `
-    <article class="featured-card" data-article-slug="${featured.slug}" tabindex="0">
+    <article class="featured-card ${imageHtml ? "featured-card-media" : "featured-card-text"}" data-article-slug="${featured.slug}" tabindex="0">
+      ${imageHtml}
       <div class="featured-meta">
         <span class="meta-chip">${slugToCategoryLabel(featured.category)}</span>
         <span class="meta-chip">${formatDate(featured.date)}</span>
