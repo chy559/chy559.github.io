@@ -84,6 +84,7 @@ def collect_posts() -> list[dict[str, str | int]]:
                 "date": meta["date"],
                 "summary": meta["summary"],
                 "path": f"./content/posts/{path.relative_to(POSTS_DIR).as_posix()}",
+                "content": body,
                 "excerpt": summarize_markdown(body),
                 "wordCount": estimate_word_count(body),
             }

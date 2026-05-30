@@ -314,7 +314,7 @@ async function openArticleBySlug(slug) {
   setRoute("article", { slug });
 
   try {
-    const markdown = stripFrontmatter(await fetchText(article.path));
+    const markdown = article.content || stripFrontmatter(await fetchText(article.path));
     contentNode.innerHTML = renderMarkdown(markdown);
   } catch (error) {
     contentNode.innerHTML = `
