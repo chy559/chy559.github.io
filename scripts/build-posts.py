@@ -120,6 +120,16 @@ RAW_POST_METADATA: dict[str, dict[str, str]] = {
         "collectionTitle": "PaiCli",
         "seriesOrder": "5",
     },
+    "paicli/paicli-06-mcp-skill.md": {
+        "title": "PaiCli 学习笔记 06：MCP 接入与 Skill 系统",
+        "slug": "paicli-06-mcp-skill",
+        "category": "tech",
+        "date": "2026-06-16",
+        "summary": "梳理 MCP Transport、JSON-RPC Client、Client 层封装，以及 Skill 索引、加载和同轮注入改进思路。",
+        "collection": "paicli",
+        "collectionTitle": "PaiCli",
+        "seriesOrder": "6",
+    },
     "baguwen/baguwen-01-java.md": {
         "title": "八股复习 01：Java 基础",
         "slug": "baguwen-01-java",

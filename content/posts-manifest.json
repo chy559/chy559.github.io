@@ -1,6 +1,20 @@
 {
   "posts": [
     {
+      "title": "PaiCli 学习笔记 06：MCP 接入与 Skill 系统",
+      "slug": "paicli-06-mcp-skill",
+      "category": "tech",
+      "date": "2026-06-16",
+      "summary": "梳理 MCP Transport、JSON-RPC Client、Client 层封装，以及 Skill 索引、加载和同轮注入改进思路。",
+      "collection": "paicli",
+      "collectionTitle": "PaiCli",
+      "seriesOrder": 6,
+      "path": "./content/posts/paicli/paicli-06-mcp-skill.md",
+      "content": "# MCP 接入\n\n**工具的开发者和 Agent 的开发者可以完全解耦**,双方只要遵循 MCP 协议，就能无缝对接。\n\n底层基于JSON rpc\n\n### 1.传输层mcpTransport\n\n策略模式：1.send发消息 2.onReceive接收消息 注册监听者->用stdio或者Streamable Http来实现\n\n1. stdio实现:本地建一个server的子进程，通过 stdin/stdout 一行一个 JSON-RPC 消息通信   **业务线程通过 stdin 向 MCP 子进程发送 JSON-RPC 请求，并在 `CompletableFuture` 上等待；stdout 后台线程持续监听子进程响应，收到消息后通过 id 找到 pending 中的 future 并完成它，从而唤醒等待的业务线程。** 超时是通过 **scheduler 定时任务 + CompletableFuture** 来判断的：定时任务到时间还没收到响应，就把对应 future 异常完成，从而唤醒阻塞的 request() 调用。\n\n2. StreamableHttp: 基于OKHttp实现 发post请求，可能用sse传输的情况 服务端发sessionid,client以后可以带sessionid，这样服务端就能继续\n\n### 2.协议层 JsonRpcClient\n\n基于json rpc发送请求   主要负责包装请求，用ConcurrentMap<id,future>来监听id上的任务是否完成\n\n### 3.client层\n\n主要用于包装传输层和协议层，向server发请求\n\n## Skill系统\n\n1.建立skill索引：三级skill ,用户 项目 全局  建立索引一般是name +description的一部分 塞进system prompt中\n\n2.llm根据skill的描述来看是否需要调用load skill的工具\n\n主要是建索引让llm调用\n\n## load skill干了什么\n\n1. 接收一个 name，比如 java-code-reviewer\n2. 去 SkillRegistry 里查这个 Skill 是否存在且已启用\n3. 取出该 Skill 的 SKILL.md 正文 body\n4. 如果正文超过 5KB，截断\n5. 把正文放进 SkillContextBuffer\n6. 返回提示：这个 Skill 会在下一轮上下文中以 ## 已加载 Skill：xxx 注入\n\nload skill对 LLM 生效的方式：**不是作为 system prompt，也不是作为 tool result，而是作为下一轮 user message 的前置上下文**。\n\n## 改进\n\n不足:load skill要在下一轮对话才能加载skill进行操作\n\n改进:新增skillinject类在同一个循环中就可以将buffer中的内容注入user message",
+      "excerpt": "MCP 接入 工具的开发者和 Agent 的开发者可以完全解耦**,双方只要遵循 MCP 协议，就能无缝对接。 底层基于JSON rpc 1.传输层mcpTransport 策略模式：1.send发消息 2.onReceive接收消息 注册监听者->用stdio或者Streamable Http来实现 1. stdio实现:本地建一个server的子进程，通...",
+      "wordCount": 554
+    },
+    {
       "title": "PaiCli 学习笔记 03：Memory 架构与代码库 RAG",
       "slug": "paicli-03-memory-rag",
       "category": "tech",
@@ -38,9 +52,9 @@
       "collectionTitle": "PaiCli",
       "seriesOrder": 5,
       "path": "./content/posts/paicli/paicli-05-hitl-tool-call.md",
-      "content": "# 人工审批层(HITL)和Tool Call\n\n让hitltoolregister继承toolregister,创建Agent时传入hitl,利用java的多态，这就是 HITL 能截获所有 tool call 的原因。Agent 代码看起来只是调用 ToolRegistry，但运行时多态会进入 HitlToolRegistry.executeToolOutput()。@Override做了覆写\n\n## tool的链路\n\n1. agent收集LLM发过来的所有toolcalls并封装成一个List<ToolInvocation> \n\n2. 发给toolregister并行处理这些工具调用 executeOutputTool->doExecute,根据具体的对象调用hitl的executeToolOutput\n\n## 后续的审批闸门怎么工作\n\n1. HITL 没启用，或工具不在危险集合里：直接走 super.doExecuteTool(...)。\n2. 如果是 Chrome DevTools MCP 工具，先做一次 checkBrowserTool(..., previewOnly=true)。\n3. 敏感页面上的浏览器改写操作，强制单次审批，不吃 approve-all。\n4. 如果当前工具或 MCP server 已经 approve-all，本次直接执行。\n5. 否则构造 ApprovalRequest，调用 hitlHandler.requestApproval(request)\n\n<img title=\"\" src=\"https://cdn.paicoding.com/paicoding/dff1ec61873798992e1283f4bcf4a8ac.jpg\" alt=\"\" width=\"794\">",
-      "excerpt": "人工审批层(HITL)和Tool Call 让hitltoolregister继承toolregister,创建Agent时传入hitl,利用java的多态，这就是 HITL 能截获所有 tool call 的原因。Agent 代码看起来只是调用 ToolRegistry，但运行时多态会进入 HitlToolRegistry.executeToolOutpu...",
-      "wordCount": 235
+      "content": "# 人工审批层(HITL)和Tool Call(Function calling)\n\n让hitltoolregister继承toolregister,创建Agent时传入hitl,利用java的多态，这就是 HITL 能截获所有 tool call 的原因。Agent 代码看起来只是调用 ToolRegistry，但运行时多态会进入 HitlToolRegistry.executeToolOutput()。@Override做了覆写\n\n## tool的链路\n\n1. agent收集LLM发过来的所有toolcalls并封装成一个List<ToolInvocation> \n\n2. 发给toolregister并行处理这些工具调用 executeOutputTool->doExecute,根据具体的对象调用hitl的executeToolOutput\n\n## 后续的审批闸门怎么工作\n\n1. HITL 没启用，或工具不在危险集合里：直接走 super.doExecuteTool(...)。\n2. 如果是 Chrome DevTools MCP 工具，先做一次 checkBrowserTool(..., previewOnly=true)。\n3. 敏感页面上的浏览器改写操作，强制单次审批，不吃 approve-all。\n4. 如果当前工具或 MCP server 已经 approve-all，本次直接执行。\n5. 否则构造 ApprovalRequest，调用 hitlHandler.requestApproval(request)\n\n<img title=\"\" src=\"https://cdn.paicoding.com/paicoding/dff1ec61873798992e1283f4bcf4a8ac.jpg\" alt=\"\" width=\"794\">\n\n## 总的架构\n\nHitlToolRegistry 负责拦截工具调用\nApprovalPolicy 负责判定是否危险\nApprovalRequest 负责描述待审批动作\nHitlHandler 负责人机交互抽象\nTerminalHitlHandler / RendererHitlHandler 负责具体 UI\nApprovalResult 负责表达人的决定\nToolRegistry.doExecuteTool 负责真正执行与策略拒绝\nAuditLog 负责留下事实记录\n\n## 联网搜索\n\nweb_search:获取url\n\nweb_fetch：根据url获取网页的关键信息",
+      "excerpt": "人工审批层(HITL)和Tool Call(Function calling) 让hitltoolregister继承toolregister,创建Agent时传入hitl,利用java的多态，这就是 HITL 能截获所有 tool call 的原因。Agent 代码看起来只是调用 ToolRegistry，但运行时多态会进入 HitlToolRegistr...",
+      "wordCount": 339
     },
     {
       "title": "PaiSmart 学习笔记 01：RAG 项目总览与核心链路",

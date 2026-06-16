@@ -1,4 +1,4 @@
-# 人工审批层(HITL)和Tool Call
+# 人工审批层(HITL)和Tool Call(Function calling)
 
 让hitltoolregister继承toolregister,创建Agent时传入hitl,利用java的多态，这就是 HITL 能截获所有 tool call 的原因。Agent 代码看起来只是调用 ToolRegistry，但运行时多态会进入 HitlToolRegistry.executeToolOutput()。@Override做了覆写
 
@@ -17,3 +17,20 @@
 5. 否则构造 ApprovalRequest，调用 hitlHandler.requestApproval(request)
 
 <img title="" src="https://cdn.paicoding.com/paicoding/dff1ec61873798992e1283f4bcf4a8ac.jpg" alt="" width="794">
+
+## 总的架构
+
+HitlToolRegistry 负责拦截工具调用
+ApprovalPolicy 负责判定是否危险
+ApprovalRequest 负责描述待审批动作
+HitlHandler 负责人机交互抽象
+TerminalHitlHandler / RendererHitlHandler 负责具体 UI
+ApprovalResult 负责表达人的决定
+ToolRegistry.doExecuteTool 负责真正执行与策略拒绝
+AuditLog 负责留下事实记录
+
+## 联网搜索
+
+web_search:获取url
+
+web_fetch：根据url获取网页的关键信息
