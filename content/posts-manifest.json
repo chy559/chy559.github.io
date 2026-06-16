@@ -15,6 +15,34 @@
       "wordCount": 554
     },
     {
+      "title": "微服务实战 01：PmHub 总览与 Docker 快速启动",
+      "slug": "pmhub-01-overview-docker",
+      "category": "tech",
+      "date": "2026-06-16",
+      "summary": "整理 PmHub 的 Spring Cloud 微服务组成、Docker Compose 快速启动、需求分析、技术选型和系统分层。",
+      "collection": "pmhub",
+      "collectionTitle": "微服务实战",
+      "seriesOrder": 1,
+      "path": "./content/posts/pmhub/pmhub-01-overview-docker.md",
+      "content": "<img title=\"\" src=\"file:///C:/Users/陈%20华%20宇/Pictures/Screenshots/屏幕截图%202026-06-07%20191703.png\" alt=\"\" width=\"726\">\n\nSpring Cloud:注册中心，请求调用，熔断，网关\n\n## docker快速启动\n\ndocker compose up -d pmhub-mysql pmhub-redis pmhub-nacos pmhub-seata\ndocker compose up -d pmhub-auth pmhub-gateway pmhub-system pmhub-project pmhub-workflow\n\n.\\start-pmhub-dev.ps1\n\n.\\stop-pmhub-dev.ps1\n\n##### 编写 Docker Compose 与 PowerShell 自动化脚本，实现 PmHub 前后端及 MySQL、Redis、Nacos 等依赖服务一键启动，解决容器化部署中的配置兼容与中文编码问题。\n\n## 需求分析\n\n1. **项目协作管理**\n\n包括项目创建、项目列表、项目详情、项目成员、项目阶段、项目进度、项目文件、项目日志等。目标是让团队能集中管理项目状态，而不是靠 Excel、聊天记录、文档零散维护。\n\n2. **任务管理**\n\n包括任务创建、任务分配、任务状态流转、子任务、任务工时、任务负责人、任务提醒等。它解决的是“谁负责什么、做到哪一步、是否延期、是否完成”的协作问题。\n\n3. **流程审批**\n\n项目里集成了 Flowable 工作流，用来做流程模型、表单设计、流程部署、流程实例、待办任务等。它解决的是企业里常见的“项目发布、任务变更、审批流转”不能只靠简单状态字段的问题。\n\n4. **系统权限管理**\n\n包括用户、角色、菜单、部门、岗位、字典、参数配置、登录日志、操作日志等。它解决的是后台系统必须有的权限控制和组织架构管理问题。\n\n5. **统一认证与访问入口**\n\n通过认证服务和网关服务，把登录、Token、接口鉴权、白名单、路由转发统一起来。这样前端只访问网关，后端服务可以隐藏在网关后面。\n\n6. **微服务拆分与服务治理**\n\n项目拆成 auth、gateway、system、project、workflow、job、gen 等服务，并用 Nacos 做注册发现和配置中心，用 Feign 做服务间调用。这解决的是单体系统变大后难维护、难扩展的问题。\n\n7. **缓存、限流、事务、监控等基础能力**\n\n它接入 Redis、Sentinel、Seata、Spring Boot Admin、Actuator、Docker Compose 等组件，解决缓存加速、接口限流、跨服务事务一致性、服务状态监控和本地/服务器部署的问题。\n\n## 技术选型\n\n服务注册与发现:Nacos\n\n配置中心:Nacos\n\napi网关:spring Gateway\n\n熔断限流:sentinel\n\n链路追踪：SkyWalking\n\n服务调用:openFeign    用openFeign注解动态代理实现远程的调用 类似于mybatis-plus\n\n分布式数据库:Seata\n\n<img title=\"\" src=\"https://cdn.nlark.com/yuque/0/2024/png/29495295/1720751962092-18914a92-752e-4849-b792-1eed70e9763b.png?x-oss-process=image%2Fwatermark%2Ctype_d3F5LW1pY3JvaGVp%2Csize_26%2Ctext_UG1IdWI%3D%2Ccolor_FFFFFF%2Cshadow_50%2Ct_80%2Cg_se%2Cx_10%2Cy_10\" alt=\"\" width=\"688\">\n\n### 重点学什么：限流 降级 分布式数据一致性 分布式锁\n\n___\n\n## 分层\n\n网关层  业务层   基础服务层（中间件） 存储层(mysql redis)\n\n![](C:\\Users\\陈%20华%20宇\\Pictures\\Screenshots\\屏幕截图%202026-06-10%20135250.png)\n\ntoken存：login_tokens:{uuid} -> LoginUser",
+      "excerpt": "<img title=\"\" src=\"file:///C:/Users/陈%20华%20宇/Pictures/Screenshots/屏幕截图%202026-06-07%20191703.png\" alt=\"\" width=\"726\"> Spring Cloud:注册中心，请求调用，熔断，网关 docker快速启动 docker compose up -d...",
+      "wordCount": 756
+    },
+    {
+      "title": "微服务实战 02：Nacos、网关、Sentinel 与 Seata",
+      "slug": "pmhub-02-nacos-gateway-sentinel",
+      "category": "tech",
+      "date": "2026-06-16",
+      "summary": "整理 PmHub 中 Nacos 注册配置中心、Gateway 鉴权路由、Sentinel 限流熔断、OpenFeign 调用和 Seata 分布式事务。",
+      "collection": "pmhub",
+      "collectionTitle": "微服务实战",
+      "seriesOrder": 2,
+      "path": "./content/posts/pmhub/pmhub-02-nacos-gateway-sentinel.md",
+      "content": "# 1：注册中心\n\n## Nacos1:服务注册中心\n\n**这个项目里的 Nacos 既是服务通讯录，也是配置仓库。服务启动时把 spring.application.name + ip + port 注册进去；网关和 Feign 调用服务时，再用服务名从 Nacos 查真实地址。**\n\n1.引入springcloud alibaba\n\n2.在需要放进nacos的微服务中引入nacos-discovery\n\n3.各个微服务在bootstrap中添加nacos作为注册中心的配置\n\n## Nacos2:配置中心\n\n配置变更后立即生效 基于nacos的实时推送机制\n\n1.添加nacos-config依赖\n\n2.bootstrap添加nacos的配置\n\n动态配置:\n\nNacos Client 长轮询监听 dataId\n-> 配置变化后拉取新内容\n-> 更新 Spring Environment\n-> @RefreshScope Bean 重新创建\n-> @ConfigurationProperties 重新绑定\n\n## Nacos持久化\n\n这里使用的是mysql\n\n## Nacos的作用总结\n\nNacos 在项目中同时承担**服务注册发现和配置中心**职责。服务注册发现用于支撑 Gateway 路由和 OpenFeign 服务间调用，避免硬编码服务地址；配置中心用于统一管理各微服务配置，支持部分配置动态刷新，降低多服务环境下配置修改和发布成本。\n\n____\n\n# 2：网关\n\n主要作用:1.统一入口    2.路由   3.服务发现(通过nacos）   4.**统一鉴权**  \n\n1. **白名单放行**  \n   登录、注册、Swagger、静态资源等接口可以配置白名单，不走 token 校验。\n\n2. **验证码处理**  \n   网关提供 /code 生成验证码，也可以在登录/注册前通过 ValidateCodeFilter 校验验证码。\n\n3. **请求体缓存**  \n   CacheRequestFilter 解决网关过滤器中请求体只能读一次的问题，方便验证码等过滤器读取 body。\n\n4. **安全过滤**  \n   包括 XSS 过滤、黑名单 URL 过滤等。\n\n5. **限流熔断**  \n   集成 Sentinel，可以对网关路由做流控，比如限制 pmhub-auth、pmhub-system 的访问流量。\n\n6. **统一日志**  \n   AuthFilter 中记录接口访问路径、参数、耗时等信息。\n\n## 三大法宝\n\n路由，断言，过滤(分为 全局过滤器和路由过滤器)\n\n## 路由动态uri\n\nlb://服务名   通过nacos实现动态的uri\n\n## 接口访问耗时\n\n```java\nreturn chain.filter(exchange).then(Mono.fromRunnable(() -> {\n\n            try {\n\n                // 记录接口访问日志\n\n                Long beginVisitTime = exchange.getAttribute(BEGIN_VISIT_TIME);\n\n                if (beginVisitTime != null) {\n\n                    URI uri = exchange.getRequest().getURI();\n\n                    Map<String, Object> logData = new HashMap<>();\n\n                    logData.put(\"host\", uri.getHost());\n\n                    logData.put(\"port\", uri.getPort());\n\n                    logData.put(\"path\", uri.getPath());\n\n                    logData.put(\"query\", uri.getRawQuery());\n\n                    logData.put(\"duration\", (System.currentTimeMillis() - beginVisitTime) + \"ms\");\n\n                    log.info(\"访问接口信息: {}\", logData);\n\n                    log.info(\"我是美丽分割线: ###################################################\");\n\n                }\n\n            } catch (Exception e) {\n\n                log.error(\"记录日志时发生异常: \", e);\n\n            }\n\n        }));\n```\n\n过滤器里面的Mono.FormRunnable 的 then逻辑来实现\n\n# 3.熔断降级限流(Sentinel)网关级别的限流\n\n1.1配合Gateway实现限流：pom引入依赖 yml写sentinel配置 nacos动态配置 \n\n```\n超过阈值抛出 BlockException\n-> SentinelFallbackHandler 捕获异常并返回“请求超过最大数，请稍候再试”\n```\n\n1.2.配合openFeign实现熔断降级\n\n第一步，使用 @FeignClient 注解上添加自定义的 fallbackFactory。\n\n第二步，创建 UserFeginFallbackFactory 进行自定义的降级处理。\n\nfeign.sentinel.enabled=true\n\n+ @EnablePmFeignClients 扫描 Feign 接口\n+ @FeignClient(fallbackFactory=xxx)\n+ FallbackFactory 返回兜底实现\n  = 远程调用失败时返回 R.fail(...)，避免异常直接击穿业务 \n\nsentinel根据慢调用比例，异常比例，异常数来进行熔断\n\n2.redis固定窗口配合注解进行限流 \n\n**两者的区别：** Redis 限流超了，默认是业务拒绝，不是 OpenFeign 熔断；\n\n除非这个业务拒绝最终被 Feign 识别成异常，否则不会走 fallback。Sentinel 熔断/降级要看 Sentinel 自己的规则信号，比如慢调用比例、异常比例、异常数等。\n\n# 4.服务间的调用-------OpenFeign\n\n特点:声明式调用 只用写接口 类似于mapper 底层是基于jdk的动态代理调用http服务\n\n配合nacos实现动态配置调用\n\n作用：\n\n1. 用于微服务间的http调用，声明式接口简化代码\n\n2. 用于熔断降级自定义实现fallbackFactory 支持sentinel和fallback\n\n# 5.分布式事务解决方案------Seata\n\n常见解决手段：\n\n1. 2PC:两阶段提交，优点是一致性强缺点是性能差，阻塞严重，协调者压力大\n\n2. TCC:   Try：预留资源\n   \n              Confirm：确认执行\n              Cancel：取消回滚\n\n3. SAGA方案：是长事务方案，把一个大事务拆成多个小事务，每一步都有补偿操作\n\n4. MQ实现最终的一致性\n\nSeata模式\n\n1. AT模式：业务代码正常写 SQL，Seata 在底层帮你记录回滚日志 `undo_log`，如果全局事务失败，就根据 `undo_log` 自动补偿回滚。\n\n2. TCC SAGA",
+      "excerpt": "1：注册中心 Nacos1:服务注册中心 这个项目里的 Nacos 既是服务通讯录，也是配置仓库。服务启动时把 spring.application.name + ip + port 注册进去；网关和 Feign 调用服务时，再用服务名从 Nacos 查真实地址。** 1.引入springcloud alibaba 2.在需要放进nacos的微服务中引入na...",
+      "wordCount": 1034
+    },
+    {
       "title": "PaiCli 学习笔记 03：Memory 架构与代码库 RAG",
       "slug": "paicli-03-memory-rag",
       "category": "tech",
